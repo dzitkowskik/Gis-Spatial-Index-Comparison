@@ -59,7 +59,19 @@ systemem przeglądarkowym. Serwer oprogramowania będzie łączył się z bazą 
 $Npgsql.dll$. Serwer w skutek zapytania od klienta, będzie odpalał odpowiednie procedury SQL i śledził czas ich wykonania, a następnie odsyłał wyniki. 
 Program będzie umożliwiał porównywanie czasu wykonania różnych procedur/zapytań dla wszystkich, lub dwóch wybranych sposobów 
 indeksowania. Czas wykonania w zależności od ilości danych do przetworzenia będzie prezentowany w formie wykresu. Wykresy 
-generowane będą przy pomocy biblioteki $DotNet.Highcharts$ na licencji MIT.
+generowane będą przy pomocy biblioteki $DotNet.Highcharts$ na licencji MIT. \\ 
+Program klienta będzie składał się z jednego widoku: \\
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=\textwidth]{Program.jpg}
+\caption{Widok programu}
+\label{overflow}
+\end{figure}
+\\
+\subsubsection{Opis programu}
+W menu górnym widoczne będą dwa przyciski ,,Generate report'', który zapisywać będzie plik raportu w wybranym miejscu na dysku, oraz ,,Clear'' odświeżający opcje wyboru do stanu domyślnego. Poniżej menu znajdować się będą pola edycji umożliwiające wybór rodzajów indeksów do porównania, zapytania jakie ma być testowane oraz dane na których ma być uruchomione zapytanie. Możliwe również będzie wykonanie zapytania dla wszystkich rodzajów indeksów zaznaczając pole
+,,Compare all index types''. Dodatkową funkcjonalnością będzie możliwość ręcznego wpisania zapytania (znając możliwą składnię) w pole tekstowe ,,custom SQL query''. Edycja tego pola będzie możliwa tylko po zaznaczeniu pola ,,Custom query''.
+Naciśnięcie przycisku ,,Test'' spowoduje uruchomienie testów i odświeżenie diagramu. 
 \subsection{Dane}
 Testy przeprowadzane będą na zbiorach danych o różnej strukturze oraz różnej wielkości. Dane brane pod uwagę:
 \begin{itemize}

@@ -1,0 +1,79 @@
+﻿@model DotNet.Highcharts.Highcharts
+
+<div class="row">
+    <form class="form-horizontal" role="form">
+        <div class="form-group">
+            <label class="col-md-1 control-label">Index A</label>
+            <div class="col-md-2">
+                <select class="form-control">
+                    <option>GIST</option>
+                    <option>SP-GIST</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+            </div>
+            <label class="col-md-1 control-label">Index B</label>
+            <div class="col-md-2">
+                <select class="form-control">
+                    <option>SP-GIST</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox"> Compare all index types
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-1 control-label">Data</label>            
+            <div class="col-md-5">
+                <select class="form-control">
+                    <option>Random points</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-1 control-label">Query</label>
+            <div class="col-md-3">
+                <select class="form-control">
+                    <option>Random Search</option>
+                    <option>Search 2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="checkbox pull-right">
+                    <label>
+                        <input type="checkbox"> Custom query
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <input class="form-control" id="customSQL" placeholder="custom SQL query" disabled/>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary pull-right">Test</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="row">
+@(Model)    
+</div>
+
+
