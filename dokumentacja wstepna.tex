@@ -1,0 +1,64 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[english,polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{indentfirst}
+\usepackage{fullpage}
+\usepackage{enumerate}
+\usepackage{secdot}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{graphicx}
+
+\selectlanguage{polish}
+\frenchspacing
+
+% Zdefiniowanie autorów i~tytułu:
+\author{Karol Dzitkowski}
+\title{
+	Aplikacje i usługi GIS\\
+	\huge{Porównanie indeksów przestrzennych}\\
+ 	Dokumentacja wstępna
+ } 	
+
+\begin{document}
+\maketitle
+\newpage
+
+% Wstawienie spisu tresci:
+\tableofcontents
+\newpage
+
+%Treść:
+\section{Cel projektu}
+Porównanie różnego rodzaju indeksów przestrzennych i własnych pomysłów ze standardowo dostępnym indeksem przestrzennym w QGISie
+(sprawdzenie wydajności wyszukiwania oraz odnajdywania najbliższych k punktów).
+\section{Opis problemu}
+Porównanie będzie polegało na przeprowadzeniu testów wydajności wyszukiwania, obliczania odległości, oraz innych operacji często
+używanych w aplikacjach GIS, na dużym zbiorze danych. Porównywane będą indeksy przestrzenne oparte o:
+\begin{enumerate}
+	\item Brak indeksowania
+	\item Indeksowanie naiwne (najpierw X potem Y)
+	\item B-Tree
+	\item Quadtrees
+	\item Geohashes
+	\item Hilbert Curves
+	\item R-Tree
+\end{enumerate}
+Wyniki przedstawiane będą w formie wykresów, a także w formie wygenerowanego raportu do pliku. Wyniki zostaną przeanalizowane i
+po skończeniu projektu, zostanie utworzona dokumentacja opisująca wyniki i wyciągająca wnioski płynące z testów.
+
+\section{Rozwiązanie}
+\subsection{Program}
+Rozwiązanie będzie oparte na technologii Microsoft $ASP.NET MVC4$ oraz będzie napisane głównie w języku $C\#$. Klient będzie zatem
+systemem przeglądarkowym. Serwer oprogramowania będzie łączył się z bazą danych $PostgreSQL$ z wtyczką $PostGIS$ za pomocą biblioteki 
+$Npgsql.dll$. Serwer w skutek zapytania od klienta, będzie odpalał odpowiednie procedury SQL i śledził czas ich wykonania, a następnie odsyłał wyniki. 
+Program będzie umożliwiał porównywanie czasu wykonania różnych procedur/zapytań dla wszystkich, lub dwóch wybranych sposobów 
+indeksowania. Czas wykonania w zależności od ilości danych do przetworzenia będzie prezentowany w formie wykresu. Wykresy 
+generowane będą przy pomocy biblioteki $DotNet.Highcharts$ na licencji MIT.
+
+\subsection{Baza i indeksy}
+
+\end{document}
