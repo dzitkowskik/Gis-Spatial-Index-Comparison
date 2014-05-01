@@ -40,7 +40,9 @@ Porównanie będzie polegało na przeprowadzeniu testów wydajności wyszukiwani
 używanych w aplikacjach GIS, na dużym zbiorze danych. Porównywane będą indeksy przestrzenne oparte o:
 \begin{enumerate}
 	\item Brak indeksowania
-	\item Indeksowanie naiwne (najpierw X potem Y)
+	\item Functional Indexes np. lower(col1)
+	\item GiST index
+	\item GIN index
 	\item B-Tree
 	\item Quadtrees
 	\item Geohashes
@@ -48,7 +50,9 @@ używanych w aplikacjach GIS, na dużym zbiorze danych. Porównywane będą inde
 	\item R-Tree
 \end{enumerate}
 Wyniki przedstawiane będą w formie wykresów, a także w formie wygenerowanego raportu do pliku. Wyniki zostaną przeanalizowane i
-po skończeniu projektu, zostanie utworzona dokumentacja opisująca wyniki i wyciągająca wnioski płynące z testów.
+po skończeniu projektu, zostanie utworzona dokumentacja opisująca wyniki i wyciągająca wnioski płynące z testów. Na tych samych danych
+wejściowych zostanie przetestowana wydajność indeksowania dla systemu QGIS. Wyniki dla QGIS zostaną porównane do wyników wyżej opisanych 
+testów w dokumentacji końcowej.
 
 \section{Rozwiązanie}
 \subsection{Program}
@@ -58,7 +62,16 @@ $Npgsql.dll$. Serwer w skutek zapytania od klienta, będzie odpalał odpowiednie
 Program będzie umożliwiał porównywanie czasu wykonania różnych procedur/zapytań dla wszystkich, lub dwóch wybranych sposobów 
 indeksowania. Czas wykonania w zależności od ilości danych do przetworzenia będzie prezentowany w formie wykresu. Wykresy 
 generowane będą przy pomocy biblioteki $DotNet.Highcharts$ na licencji MIT.
+\subsection{Dane}
+Testy przeprowadzane będą na zbiorach danych o różnej strukturze oraz różnej wielkości. Dane brane pod uwagę:
+\begin{itemize}
+	\item Punkty wygenerowane losowo
+	\item Linie (pary punktów) wygenerowane losowo
+	\item Prawdziwe dane dla Polski zaczerpnięte z GeoCommunity (www.geocomm.com) w formacie E00.
+\end{itemize}
+Dane w formacie E00 zostaną przekonwertowane programem e00pg i zaczytane do bazy PostgreSQL. Reszta danych zostanie 
+wygenerowana za pomocą procedur SQL bezpośrednio na bazie.
+\subsection{Indeksy}
 
-\subsection{Baza i indeksy}
 
 \end{document}
