@@ -41,19 +41,17 @@ używanych w aplikacjach GIS, na dużym zbiorze danych. Porównywane będą inde
 \begin{enumerate}
 	\item Brak indeksowania
 	\item Functional Indexes np. lower(col1)
-	\item GiST index
 	\item GIN index
 	\item B-Tree
-	\item Quadtrees
 	\item Geohashes
 	\item Hilbert Curves
-	\item R-Tree
+	\item GiST
+	\item SP-GiST
 \end{enumerate}
 Wyniki przedstawiane będą w formie wykresów, a także w formie wygenerowanego raportu do pliku. Wyniki zostaną przeanalizowane i
 po skończeniu projektu, zostanie utworzona dokumentacja opisująca wyniki i wyciągająca wnioski płynące z testów. Na tych samych danych
 wejściowych zostanie przetestowana wydajność indeksowania dla systemu QGIS. Wyniki dla QGIS zostaną porównane do wyników wyżej opisanych 
 testów w dokumentacji końcowej.
-
 \section{Rozwiązanie}
 \subsection{Program}
 Rozwiązanie będzie oparte na technologii Microsoft $ASP.NET MVC4$ oraz będzie napisane głównie w języku $C\#$. Klient będzie zatem
@@ -71,7 +69,26 @@ Testy przeprowadzane będą na zbiorach danych o różnej strukturze oraz różn
 \end{itemize}
 Dane w formacie E00 zostaną przekonwertowane programem e00pg i zaczytane do bazy PostgreSQL. Reszta danych zostanie 
 wygenerowana za pomocą procedur SQL bezpośrednio na bazie.
-\subsection{Indeksy}
+\subsection{Testy}
+Analiza oraz porównanie różnych sposobów indeksowania będzie opierała się na badaniu wpływu indeksowania na wydajność dla różnych
+zestawów danych o różnych charakterystykach i właściwościach. np. dla punktów losowych, obejmujących całą przestrzeń wartości i dla punktów skupionych
+w pewnych obszarach. Testowanie wyżej wymienionych metod indeksowania odbędzie się tylko i wyłącznie z użyciem programu, natomiast testy dla
+wydajności indeksowania QGIS odbędą się przy użyciu programu QGIS z tymi samymi danymi zaimportowanymi z bazy PostgreSQL. Wyniki testów
+zostaną przedstawione w dokumentacji końcowej w postaci tabeli oraz wykresów.
 
+\section{Źródła}
+\begin{itemize}
+	\item $https://www.cs.purdue.edu/spgist/publications.xml$
+	\item $http://drum.lib.umd.edu/bitstream/1903/1335/2/CS-TR-4556.pdf$
+	\item $http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves$
+	\item $http://informix-spatial-technology.blogspot.com/2012/01/comparison-on-b-tree-r-tree-quad-tree.html$
+	\item $https://www.youtube.com/watch?v=53onZyrn8vA$
+	\item $http://www.postgresql.org/docs/8.4/interactive/indexam.html$
+	\item $https://www.pgcon.org/2011/schedule/attachments/197_pgcon-2011.pdf$
+	\item $http://stackoverflow.com/questions/22602722/which-geo-implementation-to-use-for-millions-of-points$
+	\item $http://e00pg.sourceforge.net/$
+	\item $http://spatialnews.geocomm.com/education/tutorials/e00data/$
+	\item $http://data.geocomm.com/catalog/PL/datalist.html$
+\end{itemize}
 
 \end{document}
