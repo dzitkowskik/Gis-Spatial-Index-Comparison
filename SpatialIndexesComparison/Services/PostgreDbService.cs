@@ -14,7 +14,7 @@
 
             Random rand = new Random();
 
-            string commandText = @"SELECT * FROM (SELECT * FROM public.random_points_"+ index +" LIMIT "+size+") AS S";
+            string commandText = @"SELECT * FROM public.random_points_" + index + "_" + size;
             if (numPoints > 0)
                 commandText += " WHERE ";
             for (int i = 0; i < numPoints; i++)
@@ -37,7 +37,7 @@
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
 
-                return ts.Milliseconds;
+                return (int)ts.TotalMilliseconds;
             }
             finally
             {
