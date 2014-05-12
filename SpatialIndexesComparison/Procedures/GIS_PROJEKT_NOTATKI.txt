@@ -1,0 +1,26 @@
+TEMAT:
+Porównanie różnego rodzaju indeksów przestrzennych i własnych pomysłów
+ze standardowo dostępnym indeksem przestrzennym w QGISie 
+(sprawdzenie wydajności wyszukiwania oraz odnajdywania najbliższych k punktów)
+
+http://drum.lib.umd.edu/bitstream/1903/1335/2/CS-TR-4556.pdf
+http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves
+http://informix-spatial-technology.blogspot.com/2012/01/comparison-on-b-tree-r-tree-quad-tree.html
+https://www.youtube.com/watch?v=53onZyrn8vA
+http://www.postgresql.org/docs/8.4/interactive/indexam.html
+https://www.pgcon.org/2011/schedule/attachments/197_pgcon-2011.pdf
+http://stackoverflow.com/questions/22602722/which-geo-implementation-to-use-for-millions-of-points
+http://e00pg.sourceforge.net/
+http://spatialnews.geocomm.com/education/tutorials/e00data/
+http://data.geocomm.com/catalog/PL/datalist.html
+
+0. Brak indeksowania
+1. Indeksowanie naiwne (najpierw X potem Y)
+2. B-Tree
+3. Quadtrees
+4. Geohashes
+5. Hilbert Curves
+6. R-Tree
+
+
+
