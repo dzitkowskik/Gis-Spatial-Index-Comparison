@@ -2,47 +2,92 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Globalization;
 
     using Npgsql;
 
-    public class PostgreDbService
+    using SpatialIndexesComparison.Enums;
+
+    public class PostgreDbService : IDisposable
     {
-        public int FirstSelect(string index, int numPoints, bool andOr, double distance, int size)
+        private readonly NpgsqlConnection _conn;
+
+        public PostgreDbService()
         {
-            NpgsqlConnection conn = new NpgsqlConnection("Server=localhost;Port=5432;User Id=postgres;Password=boss;Database=spatial_index_comparison;");
-            conn.Open();
+            _conn = new NpgsqlConnection("Server=localhost;Port=5432;User Id=postgres;Password=boss;Database=spatial_index_comparison; CommandTimeout=300; ConnectionLifeTime=3;");
+            _conn.Open();
+        }
 
-            Random rand = new Random();
+        public int ExecuteSqlCommand(string commandText)
+        {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
 
-            string commandText = @"SELECT * FROM public.random_points_" + index + "_" + size;
-            if (numPoints > 0)
-                commandText += " WHERE ";
-            for (int i = 0; i < numPoints; i++)
-            {
-                var lon = rand.NextDouble() * 360 - 180;
-                var lat = rand.NextDouble() * 180 - 90;
-                if (i != 0) commandText += andOr ? " AND " : " OR ";
-                commandText += "ST_DWithin(geom, ST_SetSRID(ST_MakePoint("+lon+", "+lat+"), 4326), "+distance+")";
-            }
-            commandText += ";";
-	                                                     
-            NpgsqlCommand command = new NpgsqlCommand(commandText, conn);
-            try
-            {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
+            using (var command = new NpgsqlCommand(commandText, _conn))
+                command.ExecuteNonQuery();
 
-                command.ExecuteReader();
+            stopWatch.Stop();
+            var ts = stopWatch.Elapsed;
 
-                stopWatch.Stop();
-                TimeSpan ts = stopWatch.Elapsed;
+            return (int)ts.TotalMilliseconds;
+        }
 
-                return (int)ts.TotalMilliseconds;
-            }
-            finally
-            {
-                conn.Close();
-            }
+        public void CreateIndex(IndexEnum index, DataSizeEnum dataSize)
+        {
+            string indexName = "random_points_" + (int)dataSize + "_" + index + @"_idx";
+
+            string createIndexCommandText =
+                @"DO $$
+                BEGIN
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM   pg_class c
+                    JOIN   pg_namespace n ON n.oid = c.relnamespace
+                    WHERE  c.relname = '" + indexName + @"'
+                    AND    n.nspname = 'public'
+                    ) THEN
+                    CREATE INDEX " + indexName + @"
+	                ON random_points_" + (int)dataSize + @"
+	                USING " + index + @" (geom);
+                END IF;
+                END$$;";
+
+            using (var command = new NpgsqlCommand(createIndexCommandText, _conn))
+                command.ExecuteNonQuery();
+        }
+
+        public void RemoveIndex(IndexEnum index, DataSizeEnum dataSize)
+        {
+            string indexName = "random_points_" + (int)dataSize + "_" + index + @"_idx";
+            string dropIndexCommandText = @"DROP INDEX IF EXISTS " + indexName;
+
+            using (var command = new NpgsqlCommand(dropIndexCommandText, _conn))
+                command.ExecuteNonQuery();
+        }
+
+        public void DisableIndex(IndexEnum index, DataSizeEnum dataSize)
+        {
+            string indexName = "random_points_" + (int)dataSize + "_" + index + @"_idx";
+            string dropIndexCommandText = @"UPDATE pg_index SET indislive = false, indisvalid = false where indexrelid = '" + indexName + @"'::regclass;";
+            int r = 0;
+            using (var command = new NpgsqlCommand(dropIndexCommandText, _conn))
+                r = command.ExecuteNonQuery();
+            if(r != 1) throw new Exception("Nieudana kwerenda");
+        }
+
+        public void EnableIndex(IndexEnum index, DataSizeEnum dataSize)
+        {
+            string indexName = "random_points_" + (int)dataSize + "_" + index + @"_idx";
+            string dropIndexCommandText = @"UPDATE pg_index SET indislive = true, indisvalid = true where indexrelid = '" + indexName + @"'::regclass;";
+            int r = 0;
+            using (var command = new NpgsqlCommand(dropIndexCommandText, _conn))
+                r = command.ExecuteNonQuery();
+            if (r != 1) throw new Exception("Nieudana kwerenda");
+        }
+
+        public void Dispose()
+        {
+            _conn.Close();
         }
     }
 }

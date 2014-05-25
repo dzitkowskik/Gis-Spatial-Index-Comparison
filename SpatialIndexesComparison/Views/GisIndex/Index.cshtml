@@ -33,10 +33,15 @@
             <div class="col-md-3">
                 @Html.DropDownListFor(m => m.Query, Html.EnumDropdown(typeof(QueryEnum)), "", new { @class = "form-control" })
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
+                <div class="pull-right">
+                    @Html.TextBoxFor(m => m.NumberOfQueries, new { @class = "form-control"})
+                </div>
+            </div>
+            <div class="col-md-1">
                 <div class="checkbox pull-right">
                     <label>
-                        @Html.CheckBoxFor(m => m.CustomSql) Custom query
+                        @Html.CheckBoxFor(m => m.CustomSql) Custom
                     </label>
                 </div>
             </div>

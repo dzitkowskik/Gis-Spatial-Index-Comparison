@@ -3,6 +3,8 @@
     public enum IndexEnum
     {
         noindex,
-        gistindex
+        gist,
+        btree,
+        rtree
     }
 }

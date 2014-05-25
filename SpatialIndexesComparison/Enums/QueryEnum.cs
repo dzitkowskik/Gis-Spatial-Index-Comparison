@@ -2,6 +2,8 @@
 {
     public enum QueryEnum
     {
-        distanceToRandomPoint
+        FindPointsNearRandomPoints,
+        FindNearestNeighbours,
+        AllToAllTouchesQuery
     }
 }
