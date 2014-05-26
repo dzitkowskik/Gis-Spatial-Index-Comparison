@@ -74,7 +74,7 @@ BEGIN
 		AND    n.nspname = 'public'
 	) 
 	THEN
-		CREATE TABLE random_points_" + (int)dataSize + @"
+		CREATE TABLE " + tableName + @"
 		(
 			id serial NOT NULL,
 			geom geometry,
@@ -87,7 +87,7 @@ BEGIN
 " + (data != DataEnum.countries ? @"
 		FOR i IN 1.." + (int)dataSize + @" 
 		LOOP
-			INSERT INTO public.random_points_" + (int)dataSize + @"(geom)
+			INSERT INTO " + tableName + @"(geom)
 				VALUES (ST_SetSRID(ST_MakePoint((random()*360)-180, (random()*180-90)), 4326));
 		END LOOP;" : string.Empty) + @"
 	END IF;
