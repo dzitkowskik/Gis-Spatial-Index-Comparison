@@ -183,11 +183,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\PostgreDbService.cs" />
     <Compile Include="Services\QGisService.cs" />
+    <Compile Include="Services\Queries\TouchesAllToAllQuery.cs" />
     <Compile Include="Services\Queries\FindNearestNeighboursQuery.cs" />
     <Compile Include="Services\Queries\FindPointsNearRandomPointsQuery.cs" />
     <Compile Include="Services\Queries\Query.cs" />
     <Compile Include="Services\Queries\QueryFactory.cs" />
     <Compile Include="ViewModels\ComparisonViewModel.cs" />
+    <Compile Include="ViewModels\ReportViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -253,6 +255,14 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
     <None Include="Scripts\jquery-1.9.0.intellisense.js" />
+    <Content Include="Procedures\CREATEbtreeindex.sql" />
+    <Content Include="Procedures\CREATEgistindex.sql" />
+    <Content Include="Procedures\CREATEhashindex.sql" />
+    <Content Include="Procedures\CreateIndexes.sql" />
+    <Content Include="Procedures\CREATEnoindex.sql" />
+    <Content Include="Procedures\CreateTables.sql" />
+    <Content Include="Procedures\gistemp.txt" />
+    <Content Include="Procedures\GIS_PROJEKT_NOTATKI.txt" />
     <Content Include="Procedures\Procedures.sql" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -305,6 +315,7 @@
     <Content Include="Views\Shared\_MyLayout.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\GisIndex\Index.cshtml" />
+    <Content Include="Views\GisIndex\Report.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

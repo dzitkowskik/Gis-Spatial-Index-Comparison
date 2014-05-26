@@ -2,6 +2,9 @@
 {
     public enum DataEnum
     {
-        random
+        random_points,
+        countries,
+        sorted,
+        lines
     }
 }

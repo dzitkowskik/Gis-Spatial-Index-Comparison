@@ -12,9 +12,6 @@
         public bool AllIndexes { get; set; }
         public DataEnum Data { get; set; }
         public QueryEnum Query { get; set; }
-        public bool CustomSql { get; set; }
-        public string SqlText { get; set; }
-
         public int NumberOfQueries { get; set; }
 
         public ComparisonViewModel(Highcharts chart)
@@ -22,11 +19,10 @@
             NumberOfQueries = 4;
             Chart = chart;
             FirstIndex = IndexEnum.gist;
-            SecondIndex = IndexEnum.noindex;
+            SecondIndex = IndexEnum.rtree;
             AllIndexes = false;
-            Data = DataEnum.random;
-            Query = QueryEnum.FindPointsNearRandomPoints;
-            CustomSql = false;
+            Data = DataEnum.countries;
+            Query = QueryEnum.FindNearestNeighbours;
         }
     }
 }

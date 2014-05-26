@@ -2,12 +2,9 @@
 {
     using System;
     using System.Configuration;
-    using System.Globalization;
-    using System.Web.UI.WebControls;
-
     using SpatialIndexesComparison.Enums;
 
-    public class FindNearestNeighboursQuery : Query
+    public class TouchesAllToAllQuery : Query
     {
         private readonly Random _random;
         private readonly double _distance;
@@ -17,7 +14,7 @@
         private readonly DataEnum _data;
         private readonly int _nearestNeighboursCount;
 
-        public FindNearestNeighboursQuery
+        public TouchesAllToAllQuery
             (
             IndexEnum index, 
             DataEnum data,
@@ -26,15 +23,16 @@
             int numberOfPoints = 1,
             double distance = 1,
             bool andOr = false,
-            int nearestNeighboursCount = 5)
+            int nearestNeighboursCount = 5
+            )
             :base(index, dataSize)
         {
+            this._data = data;
             this._random = random;
             this._distance = distance;
             this._numberOfPoints = numberOfPoints;
             this._andOr = andOr;
             this._nearestNeighboursCount = nearestNeighboursCount;
-            this._data = data;
             this._qgisPathPrefix = ConfigurationManager.AppSettings["QgisPathPrefix"];
         }
 
@@ -57,8 +55,7 @@
 (
 	SELECT geom
 	FROM " + tableName + @" B
-	ORDER BY A.geom <-> B.geom
-	LIMIT " + _nearestNeighboursCount + @"
+	WHERE ST_TOUCHES(A.geom, B.geom)
 )";
 
             return service.ExecuteSqlCommand(commandText);
@@ -68,6 +65,8 @@
         {
             string tableName = this._data.ToString();
             tableName += (this._dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)this._dataSize);
+
+            if (this._data == DataEnum.countries) return 1339.38054286;
 
             var script = @"#!/usr/bin/env Python
 
@@ -88,16 +87,19 @@ layer = QgsVectorLayer(uri.uri(), 'test', 'postgres')
 if not layer.isValid():
     print ""Layer failed to load!""
 
-k = " + _nearestNeighboursCount + @"
 index = QgsSpatialIndex()
 for f in layer.getFeatures():
     index.insertFeature(f)
 
-def rtreeindex_nearestNeighbours():
+def rtreeindex_touches():
     for feature in layer.getFeatures():
-        nearestIds = index.nearestNeighbor(feature.geometry().asPoint(), k)
+        ids = index.intersects(feature.geometry().boundingBox())
+        for id in ids:
+            iter = layer.getFeatures(QgsFeatureRequest().setFilterFid(id)).nextFeature(f)
+            if f == feature: continue
+            touches = f.geometry().touches(feature.geometry())
 
-print timeit.timeit(rtreeindex_nearestNeighbours, number=1)";
+print timeit.timeit(rtreeindex_touches, number=1)";
 
             return service.ExecuteScript(script);
         }

@@ -1,0 +1,56 @@
+﻿@using SpatialIndexesComparison.Enums
+@model List<SpatialIndexesComparison.ViewModels.ReportViewModel>
+@{
+    int testNumber = 0;
+}
+
+<div class="row">
+    @foreach (var m in Model)
+    {
+        <h3>Test @(testNumber++) Query: @m.Query.ToString() Data: @m.Data.ToString()</h3>
+        <table class="table table-bordered">
+            @if (m.Data == DataEnum.countries)
+            {
+                
+                <thead>
+                    <tr>
+                        @foreach (IndexEnum indexEnum in m.Results.Select(t => t.Index).Distinct())
+                        {
+                            <th>@indexEnum.ToString()</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        @foreach (IndexEnum indexEnum in m.Results.Select(t => t.Index).Distinct())
+                        {
+                             foreach (var result in m.Results.Where(t => t.Index == indexEnum))
+                             {
+                                 <td>@result.Result</td>
+                             }
+                        }
+                    </tr>
+                </tbody>
+            }
+            else
+            {
+                <thead>
+                    <th>Index</th><th>100</th><th>1000</th><th>10k</th><th>100k</th><th>1M</th><th>2M</th><th>3M</th><th>4M</th><th>5M</th>
+                </thead>
+                <tbody>
+                    @foreach (IndexEnum indexEnum in m.Results.Select(t => t.Index).Distinct())
+                    {
+                        <tr>
+                            <td>@indexEnum.ToString()</td>
+                            @foreach (var result in m.Results.Where(t => t.Index == indexEnum))
+                            {
+                                <td>@result.Result.ToString("F")</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            }
+            
+        </table>
+    }
+</div>

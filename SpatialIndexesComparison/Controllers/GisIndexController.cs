@@ -3,8 +3,10 @@
 namespace SpatialIndexesComparison.Controllers
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
+    using DotNet.Highcharts.Enums;
     using DotNet.Highcharts.Helpers;
     using DotNet.Highcharts.Options;
 
@@ -19,26 +21,14 @@ namespace SpatialIndexesComparison.Controllers
         {
             var random = new Random();
 
-            DotNet.Highcharts.Highcharts chart = new DotNet.Highcharts.Highcharts("chart")
-                .SetTitle(
-                    new Title
+            var series = new[]
                     {
-                        Text = "Comparison result",
-                    })
-                .SetXAxis(
-                    new XAxis
-                    {
-                        Categories = new[] { "1k", "10k", "100k", "1M", "2M", "3M", "4M", "5M" }
-                    })
-                .SetYAxis(new YAxis { Title = new YAxisTitle { Text = "Time (ms)" }, })
-                .SetSeries(
-                    new[]
-                    {
-                        this.GetSeries(QueryEnum.FindPointsNearRandomPoints, IndexEnum.gist, random, 1),
-                        this.GetSeries(QueryEnum.FindPointsNearRandomPoints, IndexEnum.noindex, random, 1),
-                        this.GetSeries(QueryEnum.FindPointsNearRandomPoints, IndexEnum.rtree, random, 1),
-                        this.GetSeries(QueryEnum.FindPointsNearRandomPoints, IndexEnum.btree, random, 1),
-                    });
+                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.gist, random, 10, DataEnum.countries),
+                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.rtree, random, 10, DataEnum.countries),
+                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.noindex, random, 10, DataEnum.countries),
+                    };
+
+            DotNet.Highcharts.Highcharts chart = this.GetChart(series, DataEnum.countries);
 
             return View(new ComparisonViewModel(chart));
         }
@@ -57,52 +47,86 @@ namespace SpatialIndexesComparison.Controllers
             {
                 series = new[]
                          {
-                             this.GetSeries(viewModel.Query, viewModel.FirstIndex, random, viewModel.NumberOfQueries),
-                             this.GetSeries(viewModel.Query, viewModel.SecondIndex, random, viewModel.NumberOfQueries),
+                             this.GetSeries(viewModel.Query, viewModel.FirstIndex, random, viewModel.NumberOfQueries, viewModel.Data),
+                             this.GetSeries(viewModel.Query, viewModel.SecondIndex, random, viewModel.NumberOfQueries, viewModel.Data),
                          };
             }
             else
             {
                 series = Enum.GetValues(typeof(IndexEnum)).OfType<IndexEnum>()
-                    .Select(t => this.GetSeries(viewModel.Query, t, random, viewModel.NumberOfQueries)).ToArray();
+                    .Select(t => this.GetSeries(viewModel.Query, t, random, viewModel.NumberOfQueries, viewModel.Data)).ToArray();
             }
 
-            DotNet.Highcharts.Highcharts chart = new DotNet.Highcharts.Highcharts("chart")
-                .SetTitle(
-                    new Title
-                    {
-                        Text = "Comparison result",
-                    })
-                .SetXAxis(
-                    new XAxis
-                    {
-                        Categories = new[] { "10k", "100k", "1M", "2M", "3M", "4M", "5M" }
-                    })
-                .SetYAxis(new YAxis { Title = new YAxisTitle { Text = "Time (ms)" }, })
-                .SetSeries(series);
+            DotNet.Highcharts.Highcharts chart = this.GetChart(series, viewModel.Data);
 
             viewModel.Chart = chart;
+
+            var report = (Session["report"] as List<ReportViewModel>) ?? new List<ReportViewModel>();
+            report.Add(new ReportViewModel(viewModel, series));
+            Session["report"] = report;
 
             return View(viewModel);
         }
 
-        private Series GetSeries(QueryEnum queryEnum, IndexEnum index, Random random, int times)
+        private DotNet.Highcharts.Highcharts GetChart(Series[] series, DataEnum data)
         {
+            Chart chart = null;
+            XAxis xAxis = null;
+            PlotOptions options = null;
+            switch (data)
+            {
+                case DataEnum.random_points:
+                    xAxis = new XAxis { Categories = new[] { "100", "1k", "10k", "100k", "1M", "2M", "3M", "4M", "5M" } };
+                    options = new PlotOptions();
+                    chart = new Chart();
+                    break;
+                case DataEnum.countries:
+                    xAxis = new XAxis { Categories = series.Select(t => t.Name).ToArray() };
+                    options = new PlotOptions { Column = new PlotOptionsColumn { Stacking = Stackings.Normal } };
+                    chart = new Chart { DefaultSeriesType = ChartTypes.Column };
+                    
+                    // ReSharper disable once PossibleNullReferenceException
+                    var results = new object[series.Length];
+                    for (int i = 0; i < series.Length; i++)
+                        results[i] = series.FirstOrDefault(x => x.Name.Equals(series[i].Name)).Data.ArrayData[0];
+                    series = new[]{ new Series{ Name = data.ToString(), Data = new Data(results)} };
+
+                    break;
+            }
+            
+            return new DotNet.Highcharts.Highcharts("chart")
+                .InitChart(chart)
+                .SetTitle(new Title{ Text = "Comparison result" })
+                .SetXAxis(xAxis)
+                .SetYAxis(new YAxis { Title = new YAxisTitle { Text = "Time (ms)" }, })
+                .SetSeries(series)
+                .SetPlotOptions(options);
+        }
+
+        private Series GetSeries(QueryEnum queryEnum, IndexEnum index, Random random, int times, DataEnum dataEnum)
+        {
+            var data = new List<object>();
+            if (dataEnum == DataEnum.countries)
+            {
+                var speed = GetIndexSpeed(QueryFactory.Get(queryEnum, index, dataEnum, DataSizeEnum.None, random), times);
+                data.Add(speed);
+            }
+            else
+            {
+                foreach (var value in Enum.GetValues(typeof(DataSizeEnum)))
+                {
+                    if((DataSizeEnum)value == DataSizeEnum.None) continue;
+                    var speed = GetIndexSpeed(QueryFactory.Get(queryEnum, index, dataEnum, (DataSizeEnum)value, random), times);
+                    if (speed.Equals(-1.0d))
+                        break;
+                    data.Add(speed);
+                }
+            }
+
             return new Series
                    {
                        Name = index.ToString(),
-                       Data = new Data(
-                                                new object[]
-                                                {
-                                                    GetIndexSpeed(QueryFactory.Get(queryEnum, index, DataSizeEnum.Size1000, random), times),
-                                                    GetIndexSpeed(QueryFactory.Get(queryEnum, index, DataSizeEnum.Size10000, random), times),
-                                                    GetIndexSpeed(QueryFactory.Get(queryEnum, index, DataSizeEnum.Size100000, random), times),
-                                                    GetIndexSpeed(QueryFactory.Get(queryEnum, index, DataSizeEnum.Size1000000, random), times),
-                                                    GetIndexSpeed(QueryFactory.Get(queryEnum, index, DataSizeEnum.Size2000000, random), times),
-                                                    GetIndexSpeed(QueryFactory.Get(queryEnum, index, DataSizeEnum.Size3000000, random), times),
-                                                    /*GetIndexSpeed(QueryFactory.Get(queryEnum, index, DataSizeEnum.Size4000000, random), times),
-                                                    GetIndexSpeed(QueryFactory.Get(queryEnum, index, DataSizeEnum.Size5000000, random), times)*/
-                                                })
+                       Data = new Data(data.ToArray())
                    };
         }
 
@@ -120,6 +144,8 @@ namespace SpatialIndexesComparison.Controllers
                     for (int i = 0; i < times; i++)
                     {
                         var speed = query.Execute(service);
+                        if (speed.Equals(-1.0d)) 
+                            return -1.0d;
                         speed *= 1000; // to miliseconds
                         if (speed < min) min = speed;
                         if (speed > max) max = speed;
@@ -134,6 +160,8 @@ namespace SpatialIndexesComparison.Controllers
                     for (int i = 0; i < times; i++)
                     {
                         var speed = query.Execute(service);
+                        if (speed.Equals(-1.0d)) 
+                            return -1.0d;
                         if (speed < min) min = speed;
                         if (speed > max) max = speed;
                         result += speed;
@@ -146,6 +174,12 @@ namespace SpatialIndexesComparison.Controllers
                 result -= max;
             }
             return result / (times - (times >= 3 ? 2.0d : 0.0d));
+        }
+
+        public ActionResult Report()
+        {
+            var report = Session["report"] as List<ReportViewModel>;
+            return View(report);
         }
     }
 }

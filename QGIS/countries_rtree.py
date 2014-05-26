@@ -12,25 +12,28 @@ QgsApplication.initQgis()
 
 uri = QgsDataSourceURI()
 uri.setConnection('localhost', '5432', 'spatial_index_comparison', 'postgres', 'boss')
-uri.setDataSource('public', 'random_points_100000', 'geom')
+uri.setDataSource('public', 'countries', 'geom')
 
 layer = QgsVectorLayer(uri.uri(), 'test', 'postgres')
 
 if not layer.isValid():
     print "Layer failed to load!"
+	
+index = QgsSpatialIndex()
+for f in layer.getFeatures():
+	index.insertFeature(f)
+
+print 'Index created!'	
 
 def rtreeindex_touches():
-    index = QgsSpatialIndex()
-    for f in layer.getFeatures():
-        index.insertFeature(f)
-    for feature in layer.getFeatures():
-        ids = index.intersects(feature.geometry().boundingBox())
-        for id in ids:
-            iter = layer.getFeatures(QgsFeatureRequest().setFilterFid(id)).nextFeature(f)
-            if f == feature: continue
-            touches = f.geometry().touches(feature.geometry())
-
-
+	i = 1
+	for feature in layer.getFeatures():
+		ids = index.intersects(feature.geometry().boundingBox())
+		print i
+		i = i+1
+		for id in ids:
+			iter = layer.getFeatures(QgsFeatureRequest().setFilterFid(id)).nextFeature(f)
+			touches = f.geometry().touches(feature.geometry())
 			
 def rtreeindex_distanceToRandomPoint():
 	distance = 1.5
@@ -39,16 +42,6 @@ def rtreeindex_distanceToRandomPoint():
 	point_geometry = QgsGeometry.fromPoint(QgsPoint(lat,lon))
 	first_point = QgsPoint(lat+distance, lon+distance)
 	second_point = QgsPoint(lat-distance, lon-distance)
-	fname = str('rtree_random_points_100000.index')
-	if not os.path.isfile(fname):
-		fileObject = open(fname,'wb')
-		index = QgsSpatialIndex()
-		for f in layer.getFeatures():
-			index.insertFeature(f)
-		pickle.dump(index,fileObject)
-		fileObject.close()
-	fileObject = open(fname,'r')
-	index = pickle.load(fileObject)
 	q = Queue.Queue()
 	ids = index.intersects(QgsRectangle(first_point, second_point))
 	for id in ids:
@@ -57,13 +50,10 @@ def rtreeindex_distanceToRandomPoint():
 			q.put(f) 
 
 def rtreeindex_nearestNeighbours():
-    k = 3
-    index = QgsSpatialIndex()
-    for f in layer.getFeatures():
-        index.insertFeature(f)
+    k = 5
     for feature in layer.getFeatures():
         nearestIds = index.nearestNeighbor(feature.geometry().asPoint(), k)
     
-#print "Touches with rtree index: %s seconds " % timeit.timeit(rtreeindex_touches,number=1)
+print "Touches with rtree index: %s seconds " % timeit.timeit(rtreeindex_touches,number=1)
 #print "Nearest neighbours test with rtree index: %s seconds " % timeit.timeit(rtreeindex_nearestNeighbours, number=1)
-print "Distance to random point test with rtree index: %s seconds " % timeit.timeit(rtreeindex_distanceToRandomPoint, number=1)
+#print "Distance to random point test with rtree index: %s seconds " % timeit.timeit(rtreeindex_distanceToRandomPoint, number=1)

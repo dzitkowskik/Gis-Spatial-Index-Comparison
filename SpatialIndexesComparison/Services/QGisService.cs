@@ -1,9 +1,9 @@
 ﻿namespace SpatialIndexesComparison.Services
 {
     using System;
-    using System.Configuration;
     using System.Diagnostics;
     using System.IO;
+    using System.Runtime.CompilerServices;
 
     using SpatialIndexesComparison.Extensions;
 
@@ -11,8 +11,13 @@
     {
         private readonly string _path;
 
-        public QGisService()
+        private readonly int _timeout;
+
+        private delegate string ReadToEndDelegate();
+
+        public QGisService(int timeout = 60)
         {
+            this._timeout = timeout;
             _path = Path.GetTempFileName().Replace(".tmp",".py");
         }
 
@@ -26,14 +31,23 @@
                             CreateNoWindow = true,
                             Arguments = string.Format("{0}", _path),
                             UseShellExecute = false,
-                            RedirectStandardOutput = true
+                            RedirectStandardOutput = true,
                         };
 
             using (Process process = Process.Start(start))
             {
+                
                 using (StreamReader reader = process.StandardOutput)
                 {
-                    return reader.ReadToEnd().GetDouble(0.0d);
+                    ReadToEndDelegate asyncCall = reader.ReadToEnd;
+                    IAsyncResult asyncResult = asyncCall.BeginInvoke(null, null);
+                    asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_timeout));
+                    if (asyncResult.IsCompleted)
+                    {
+                        var processResult = asyncCall.EndInvoke(asyncResult);
+                        return processResult.GetDouble(-1.0d);
+                    }
+                    return -1.0d;
                 }
             }
         }

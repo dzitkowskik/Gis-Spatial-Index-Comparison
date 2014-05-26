@@ -12,15 +12,26 @@
         private readonly double _distance;
         private readonly int _numberOfPoints;
         private readonly bool _andOr;
+        private readonly DataEnum _data;
         private readonly string _qgisPathPrefix;
 
-        public FindPointsNearRandomPointsQuery(IndexEnum index, DataSizeEnum dataSize, Random random, int numberOfPoints = 1, double distance = 0.1, bool andOr = false)
+        public FindPointsNearRandomPointsQuery
+            (
+            IndexEnum index, 
+            DataEnum data, 
+            DataSizeEnum dataSize,
+            Random random,
+            int numberOfPoints = 1,
+            double distance = 1,
+            bool andOr = false
+            )
             :base(index, dataSize)
         {
             this._random = random;
             this._distance = distance;
             this._numberOfPoints = numberOfPoints;
             this._andOr = andOr;
+            this._data = data;
             this._qgisPathPrefix = ConfigurationManager.AppSettings["QgisPathPrefix"];
         }
 
@@ -30,13 +41,15 @@
             {
                 var index = (IndexEnum)value;
                 if (index == IndexEnum.rtree || index == IndexEnum.noindex) continue;
-                service.CreateIndex(index, this._dataSize);
-                service.DisableIndex(index, this._dataSize);
-                if (index == this.Index) 
-                    service.EnableIndex(this.Index, this._dataSize);
+                service.DisableIndex(index, this._dataSize, this._data);
+                if (index == this.Index)
+                    service.EnableIndex(this.Index, this._dataSize, this._data);
             }
 
-            string commandText = @"SELECT * FROM public.random_points_" + (int)_dataSize;
+            string tableName = this._data.ToString();
+            tableName += (this._dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)this._dataSize);
+
+            string commandText = @"SELECT * FROM " + tableName;
             if (_numberOfPoints > 0)
                 commandText += " WHERE ";
             for (int i = 0; i < _numberOfPoints; i++)
@@ -59,6 +72,9 @@
 
         public override double Execute(QGisService service)
         {
+            string tableName = this._data.ToString();
+            tableName += (this._dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)this._dataSize);
+
             var lon = (_random.NextDouble() * 360 - 180).ToString(CultureInfo.GetCultureInfo("en-GB"));
             var lat = (_random.NextDouble() * 180 - 90).ToString(CultureInfo.GetCultureInfo("en-GB"));
 
@@ -74,7 +90,7 @@ QgsApplication.initQgis()
 
 uri = QgsDataSourceURI()
 uri.setConnection('localhost', '5432', 'spatial_index_comparison', 'postgres', 'boss')
-uri.setDataSource('public', 'random_points_" + (int)_dataSize + @"', 'geom')
+uri.setDataSource('public', '" + tableName + @"', 'geom')
 
 layer = QgsVectorLayer(uri.uri(), 'test', 'postgres')
 

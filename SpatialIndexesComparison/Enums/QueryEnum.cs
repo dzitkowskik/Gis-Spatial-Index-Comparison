@@ -4,6 +4,6 @@
     {
         FindPointsNearRandomPoints,
         FindNearestNeighbours,
-        AllToAllTouchesQuery
+        TouchesAllToAll
     }
 }
