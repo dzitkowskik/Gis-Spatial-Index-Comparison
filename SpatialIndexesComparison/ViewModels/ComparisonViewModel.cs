@@ -16,13 +16,13 @@
 
         public ComparisonViewModel(Highcharts chart)
         {
-            NumberOfQueries = 4;
+            NumberOfQueries = 1;
             Chart = chart;
             FirstIndex = IndexEnum.gist;
-            SecondIndex = IndexEnum.rtree;
+            SecondIndex = IndexEnum.gist;
             AllIndexes = false;
-            Data = DataEnum.countries;
-            Query = QueryEnum.FindNearestNeighbours;
+            Data = DataEnum.random_points;
+            Query = QueryEnum.FindPointsNearRandomPoints;
         }
     }
 }

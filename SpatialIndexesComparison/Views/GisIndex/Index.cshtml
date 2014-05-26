@@ -8,11 +8,11 @@
         <div class="form-group">
             <label class="col-md-1 control-label">Index A</label>
             <div class="col-md-2">
-                @Html.DropDownListFor(m => m.FirstIndex, Html.EnumDropdown(typeof(IndexEnum)), "gist", new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.FirstIndex, Html.EnumDropdown(typeof(IndexEnum)), "", new { @class = "form-control" })
             </div>
             <label class="col-md-1 control-label">Index B</label>
             <div class="col-md-2">
-                @Html.DropDownListFor(m => m.SecondIndex, Html.EnumDropdown(typeof(IndexEnum)), "rtree", new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.SecondIndex, Html.EnumDropdown(typeof(IndexEnum)), "", new { @class = "form-control" })
             </div>
             <div class="col-md-3">
                 <div class="checkbox">
@@ -25,13 +25,13 @@
         <div class="form-group">
             <label class="col-md-1 control-label">Data</label>            
             <div class="col-md-5">
-                @Html.DropDownListFor(m => m.Data, Html.EnumDropdown(typeof(DataEnum)), "countries", new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.Data, Html.EnumDropdown(typeof(DataEnum)), "", new { @class = "form-control" })
             </div>
         </div>
         <div class="form-group">
             <label class="col-md-1 control-label">Query</label>
             <div class="col-md-3">
-                @Html.DropDownListFor(m => m.Query, Html.EnumDropdown(typeof(QueryEnum)), "FindNearestNeighbours", new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.Query, Html.EnumDropdown(typeof(QueryEnum)), "", new { @class = "form-control" })
             </div>
             <label class="col-md-1 control-label">Times</label>
             <div class="col-md-1">

@@ -15,7 +15,7 @@
 
         private delegate string ReadToEndDelegate();
 
-        public QGisService(int timeout = 60)
+        public QGisService(int timeout = 10)
         {
             this._timeout = timeout;
             _path = Path.GetTempFileName().Replace(".tmp",".py");

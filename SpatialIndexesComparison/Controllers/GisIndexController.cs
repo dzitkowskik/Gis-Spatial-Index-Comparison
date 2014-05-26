@@ -23,12 +23,11 @@ namespace SpatialIndexesComparison.Controllers
 
             var series = new[]
                     {
-                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.gist, random, 10, DataEnum.countries),
-                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.rtree, random, 10, DataEnum.countries),
-                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.noindex, random, 10, DataEnum.countries),
+                        this.GetSeries(QueryEnum.FindPointsNearRandomPoints, IndexEnum.gist, random, 1, DataEnum.random_points),
+                        this.GetSeries(QueryEnum.FindPointsNearRandomPoints, IndexEnum.gist, random, 1, DataEnum.random_points),
                     };
 
-            DotNet.Highcharts.Highcharts chart = this.GetChart(series, DataEnum.countries);
+            DotNet.Highcharts.Highcharts chart = this.GetChart(series, DataEnum.random_points);
 
             return View(new ComparisonViewModel(chart));
         }

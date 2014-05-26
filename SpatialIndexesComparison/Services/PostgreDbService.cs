@@ -10,7 +10,7 @@
     {
         private readonly NpgsqlConnection _conn;
 
-        public PostgreDbService(int timeout = 60)
+        public PostgreDbService(int timeout = 10)
         {
             var builder = new NpgsqlConnectionStringBuilder
                           {
@@ -100,9 +100,14 @@ $BODY$;";
 
         public void CreateIndex(IndexEnum index, DataSizeEnum dataSize, DataEnum data)
         {
+            if (data == DataEnum.countries) return;
+
             string indexName = data.ToString();
             indexName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
             indexName += "_" + index + @"_idx";
+
+            string tableName = data.ToString();
+            tableName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
 
             string createIndexCommandText =
                 @"DO $$
@@ -115,7 +120,7 @@ $BODY$;";
                     AND    n.nspname = 'public'
                     ) THEN
                     CREATE INDEX " + indexName + @"
-	                ON random_points_" + (int)dataSize + @"
+	                ON " + tableName + @"
 	                USING " + index + @" (geom);
                 END IF;
                 END$$;";
@@ -126,6 +131,8 @@ $BODY$;";
 
         public void RemoveIndex(IndexEnum index, DataSizeEnum dataSize, DataEnum data)
         {
+            if (data == DataEnum.countries) return;
+
             string indexName = data.ToString();
             indexName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
             indexName += "_" + index + @"_idx";
@@ -138,6 +145,8 @@ $BODY$;";
 
         public void DisableIndex(IndexEnum index, DataSizeEnum dataSize, DataEnum data)
         {
+            if (data == DataEnum.countries) return;
+
             string indexName = data.ToString();
             indexName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
             indexName += "_" + index + @"_idx";
@@ -151,6 +160,8 @@ $BODY$;";
 
         public void EnableIndex(IndexEnum index, DataSizeEnum dataSize, DataEnum data)
         {
+            if (data == DataEnum.countries) return;
+
             string indexName = data.ToString();
             indexName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
             indexName += "_" + index + @"_idx";
@@ -173,7 +184,7 @@ $BODY$;";
             {
                 var data = DataEnum.random_points;
                 if ((DataSizeEnum)value == DataSizeEnum.None)
-                    data = DataEnum.countries;
+                    continue;
                 this.CreateTable((DataSizeEnum)value, data);
                 this.CreateIndex(IndexEnum.gist, (DataSizeEnum)value, data);
                 this.CreateIndex(IndexEnum.btree, (DataSizeEnum)value, data);
