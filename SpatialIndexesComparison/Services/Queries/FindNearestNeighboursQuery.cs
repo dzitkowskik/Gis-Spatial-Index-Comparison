@@ -53,10 +53,12 @@
             tableName += (this._dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)this._dataSize);
 
             string commandText =
-@"SELECT * FROM " + tableName + @" A WHERE A.geom IN 
+@"SELECT 1 
+FROM " + tableName + @" AS A 
+WHERE A.geom IN 
 (
-	SELECT geom
-	FROM " + tableName + @" B
+	SELECT B.geom
+	FROM " + tableName + @" AS B
 	ORDER BY A.geom <-> B.geom
 	LIMIT " + _nearestNeighboursCount + @"
 )";

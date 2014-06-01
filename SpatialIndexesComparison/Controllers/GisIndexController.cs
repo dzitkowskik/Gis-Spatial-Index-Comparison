@@ -23,9 +23,8 @@ namespace SpatialIndexesComparison.Controllers
 
             var series = new[]
                     {
-                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.gist, random, 10, DataEnum.countries),
-                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.rtree, random, 10, DataEnum.countries),
-                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.noindex, random, 10, DataEnum.countries),
+                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.gist, random, 4, DataEnum.countries),
+                        this.GetSeries(QueryEnum.FindNearestNeighbours, IndexEnum.rtree, random, 4, DataEnum.countries),
                     };
 
             DotNet.Highcharts.Highcharts chart = this.GetChart(series, DataEnum.countries);
@@ -76,7 +75,7 @@ namespace SpatialIndexesComparison.Controllers
             switch (data)
             {
                 case DataEnum.random_points:
-                    xAxis = new XAxis { Categories = new[] { "100", "1k", "10k", "100k", "1M", "2M", "3M", "4M", "5M" } };
+                    xAxis = new XAxis { Categories = new[] { "50", "100", "500", "1k", "5k", "10k", "50k", "100k", "500k", "1M", "2M", "3M", "4M", "5M" } };
                     options = new PlotOptions();
                     chart = new Chart();
                     break;
@@ -179,7 +178,15 @@ namespace SpatialIndexesComparison.Controllers
         public ActionResult Report()
         {
             var report = Session["report"] as List<ReportViewModel>;
-            return View(report);
+            if(report != null)
+                return View(report);
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Clear()
+        {
+            Session["report"] = new List<ReportViewModel>();
+            return RedirectToAction("Index");
         }
     }
 }

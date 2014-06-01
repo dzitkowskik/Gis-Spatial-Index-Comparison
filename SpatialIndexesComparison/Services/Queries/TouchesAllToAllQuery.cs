@@ -51,9 +51,11 @@
             tableName += (this._dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)this._dataSize);
 
             string commandText =
-@"SELECT * FROM " + tableName + @" A WHERE A.geom IN 
+@"SELECT 1 
+FROM " + tableName + @" AS A 
+WHERE A.geom IN 
 (
-	SELECT geom
+	SELECT B.geom
 	FROM " + tableName + @" B
 	WHERE ST_TOUCHES(A.geom, B.geom)
 )";

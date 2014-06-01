@@ -11,7 +11,7 @@
             var result = new List<SelectListItem>();
             foreach (var value in Enum.GetValues(enumType))
             {
-                result.Add(new SelectListItem { Text = value.ToString(), Value = ((int)value).ToString() });                
+                result.Add(new SelectListItem { Text = value.ToString(), Value = value.ToString() });                
             }
             return result;
         }

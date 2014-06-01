@@ -10,7 +10,7 @@
     {
         private readonly NpgsqlConnection _conn;
 
-        public PostgreDbService(int timeout = 60)
+        public PostgreDbService(int timeout = 120)
         {
             var builder = new NpgsqlConnectionStringBuilder
                           {
@@ -104,6 +104,13 @@ $BODY$;";
             indexName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
             indexName += "_" + index + @"_idx";
 
+            if (data == DataEnum.countries)
+            {
+                if (index == IndexEnum.gist)
+                    indexName = "countries_geom_gist";
+                else return;
+            }
+
             string createIndexCommandText =
                 @"DO $$
                 BEGIN
@@ -130,6 +137,13 @@ $BODY$;";
             indexName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
             indexName += "_" + index + @"_idx";
 
+            if (data == DataEnum.countries)
+            {
+                if (index == IndexEnum.gist)
+                    indexName = "countries_geom_gist";
+                else return;
+            }
+
             string dropIndexCommandText = @"DROP INDEX IF EXISTS " + indexName;
 
             using (var command = new NpgsqlCommand(dropIndexCommandText, _conn))
@@ -141,6 +155,13 @@ $BODY$;";
             string indexName = data.ToString();
             indexName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
             indexName += "_" + index + @"_idx";
+
+            if (data == DataEnum.countries)
+            {
+                if(index == IndexEnum.gist)
+                    indexName = "countries_geom_gist";
+                else return;
+            }
 
             string dropIndexCommandText = @"UPDATE pg_index SET indislive = false, indisvalid = false where indexrelid = '" + indexName + @"'::regclass;";
             int rowsChanged;
@@ -154,6 +175,13 @@ $BODY$;";
             string indexName = data.ToString();
             indexName += (dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)dataSize);
             indexName += "_" + index + @"_idx";
+
+            if (data == DataEnum.countries)
+            {
+                if (index == IndexEnum.gist)
+                    indexName = "countries_geom_gist";
+                else return;
+            }
 
             string dropIndexCommandText = @"UPDATE pg_index SET indislive = true, indisvalid = true where indexrelid = '" + indexName + @"'::regclass;";
             int rowsChanged;
@@ -173,7 +201,7 @@ $BODY$;";
             {
                 var data = DataEnum.random_points;
                 if ((DataSizeEnum)value == DataSizeEnum.None)
-                    data = DataEnum.countries;
+                    continue;
                 this.CreateTable((DataSizeEnum)value, data);
                 this.CreateIndex(IndexEnum.gist, (DataSizeEnum)value, data);
                 this.CreateIndex(IndexEnum.btree, (DataSizeEnum)value, data);

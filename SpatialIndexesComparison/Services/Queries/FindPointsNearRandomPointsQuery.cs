@@ -49,7 +49,7 @@
             string tableName = this._data.ToString();
             tableName += (this._dataSize == DataSizeEnum.None ? string.Empty : "_" + (int)this._dataSize);
 
-            string commandText = @"SELECT * FROM " + tableName;
+            string commandText = @"SELECT 1 FROM " + tableName;
             if (_numberOfPoints > 0)
                 commandText += " WHERE ";
             for (int i = 0; i < _numberOfPoints; i++)
